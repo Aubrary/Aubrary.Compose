@@ -12,6 +12,7 @@ git add -A && git commit -m "Update submodules" && git push
 
 # How to run
 ```
+docker-compose rm
 docker-compose build
 docker-compose up
 ```
