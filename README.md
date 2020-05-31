@@ -5,4 +5,7 @@ To check out the repository, you need to clone submodules as well. So check out 
 ```git clone --recurse-submodules -j8 git@github.com:Aubrary/Aubrary.Compose.git```
 
 ## To update submodule commit pointer
-```git pull --recurse-submodules --jobs=10```
+```
+git submodule update --remote --merge
+git add -A && git commit -m "Update submodules" && git push
+```
