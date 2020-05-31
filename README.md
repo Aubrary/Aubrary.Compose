@@ -9,3 +9,12 @@ To check out the repository, you need to clone submodules as well. So check out 
 git submodule update --remote --merge
 git add -A && git commit -m "Update submodules" && git push
 ```
+
+# How to run
+```
+docker-compose build
+docker-compose up
+```
+
+### Traefik
+Located on http://localhost:8080

@@ -1,0 +1,44 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  playservice:
+    build: ./PlayService
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.playservice.rule=Host(`localhost`) && PathPrefix(`/playservice`)"
+        - "traefik.http.services.playservice.loadbalancer.server.port=80"
+        - "traefik.http.middlewares.playservicestrip.stripprefix.prefixes=/playservice"
+        - "traefik.http.routers.playservice.entrypoints=web"
+
+  userservice:
+    build: ./UserService
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.userservice.rule=Host(`localhost`) && PathPrefix(`/userservice`)"
+        - "traefik.http.services.userservice.loadbalancer.server.port=4000"
+        - "traefik.http.middlewares.userservicestrip.stripprefix.prefixes=/userservice"
+        - "traefik.http.routers.userservice.entrypoints=web"
+
+  whoami:
+    image: "containous/whoami"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`localhost`) && PathPrefix(`/whoami`)"
+      - "traefik.http.middlewares.whoamistrip.stripprefix.prefixes=/whoami"
+      - "traefik.http.routers.whoami.entrypoints=web"
