@@ -17,23 +17,58 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
+  streamservice:
+    build: ./StreamService
+    restart: always
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.streamservice.rule=Host(`localhost`) && PathPrefix(`/streamservice`)"
+        - "traefik.http.services.streamservice.loadbalancer.server.port=80"
+        - "traefik.http.middlewares.streamservicestrip.stripprefix.prefixes=/streamservice"
+        - "traefik.http.routers.streamservice.entrypoints=web"
+        - "traefik.http.routers.streamservice.middlewares=streamservicestrip"
+    volumes:
+        - ./LocalStorage/StreamServiceFiles:/streamfiles
+    environment:
+        AppSettings__StorageRootPath: "/streamfiles"
+    
+
   playservice:
     build: ./PlayService
+    restart: always
     labels:
         - "traefik.enable=true"
         - "traefik.http.routers.playservice.rule=Host(`localhost`) && PathPrefix(`/playservice`)"
         - "traefik.http.services.playservice.loadbalancer.server.port=80"
         - "traefik.http.middlewares.playservicestrip.stripprefix.prefixes=/playservice"
         - "traefik.http.routers.playservice.entrypoints=web"
+        - "traefik.http.routers.playservice.middlewares=playservicestrip"
+    environment:
+        Data__PlayServiceConnection__ConnectionString: "Server=playservice_db;Port=5432;Database=postgres;User Id=postgres;Password=supersecretpassword"
+
+  playservice_db:
+    image: postgres:12
+    restart: always
+    environment:
+        POSTGRES_PASSWORD: supersecretpassword
 
   userservice:
     build: ./UserService
+    restart: always
     labels:
         - "traefik.enable=true"
         - "traefik.http.routers.userservice.rule=Host(`localhost`) && PathPrefix(`/userservice`)"
-        - "traefik.http.services.userservice.loadbalancer.server.port=4000"
+        - "traefik.http.services.userservice.loadbalancer.server.port=80"
         - "traefik.http.middlewares.userservicestrip.stripprefix.prefixes=/userservice"
-        - "traefik.http.routers.userservice.entrypoints=web"
+        - "traefik.http.routers.userservice.middlewares=userservicestrip"
+    environment:
+        Data__UserServiceConnection__ConnectionString: "Server=userservice_db;Port=5432;Database=postgres;User Id=postgres;Password=supersecretpassword"
+
+  userservice_db:
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: supersecretpassword
 
   whoami:
     image: "containous/whoami"
