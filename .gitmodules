@@ -1,0 +1,9 @@
+[submodule "UserService"]
+	path = UserService
+	url = git@github.com:Aubrary/UserService.git
+[submodule "StreamService"]
+	path = StreamService
+	url = git@github.com:Aubrary/StreamService.git
+[submodule "PlayService"]
+	path = PlayService
+	url = git@github.com:Aubrary/PlayService.git
