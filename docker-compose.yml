@@ -17,6 +17,17 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
+  webclient:
+    build: ./webclient
+    restart: always
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.webclient.rule=Host(`localhost`) && PathPrefix(`/ui`)"
+        - "traefik.http.services.webclient.loadbalancer.server.port=80"
+        - "traefik.http.middlewares.webclientstrip.stripprefix.prefixes=/ui"
+        - "traefik.http.routers.webclient.entrypoints=web"
+        - "traefik.http.routers.webclient.middlewares=webclientstrip"
+
   streamservice:
     build: ./StreamService
     restart: always

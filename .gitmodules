@@ -7,3 +7,6 @@
 [submodule "PlayService"]
 	path = PlayService
 	url = git@github.com:Aubrary/PlayService.git
+[submodule "webclient"]
+	path = webclient
+	url = git@github.com:Aubrary/webclient.git
